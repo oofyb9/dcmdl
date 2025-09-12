@@ -20,7 +20,7 @@ def main():  # sourcery skip: extract-duplicate-method, merge-comparisons
     download_parser.add_argument('-o', '--output', type=str, help='output file name')
     download_parser.add_argument('-f', '--format', type=str, help='format of the media to download')
     download_parser.add_argument('-q', '--quality', type=str, help='quality of the media to download')
-    download_parser.add_argument('-d', "--downloader", type=str, default="auto" help="downloader to use (auto (default, a bit accurate), ytdlp, spotdl, tw, ig, gallerydl)")
+    download_parser.add_argument('-d', "--downloader", type=str, default="auto", help="downloader to use (auto (default, a bit accurate), ytdlp, spotdl, tw, ig, gallerydl)")
     download_parser.add_argument('url', type=str, help='URL of the media to download')
 
     # shorter download command (dl)
@@ -28,7 +28,7 @@ def main():  # sourcery skip: extract-duplicate-method, merge-comparisons
     dl_parser.add_argument('-o', '--output', type=str, help='output file name')
     dl_parser.add_argument('-f', '--format', type=str, help='format of the media to download')
     dl_parser.add_argument('-q', '--quality', type=str, help='quality of the media to download')
-    dl_parser.add_argument('-d', "--downloader", type=str, default="auto" help="downloader to use (auto (default, a bit accurate), ytdlp, spotdl, tw, ig, gallerydl)")
+    dl_parser.add_argument('-d', "--downloader", type=str, default="auto", help="downloader to use (auto (default, a bit accurate), ytdlp, spotdl, tw, ig, gallerydl)")
     dl_parser.add_argument('url', type=str, help='URL of the media to download')
 
     args = parser.parse_args()
