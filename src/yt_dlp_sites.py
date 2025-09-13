@@ -981,7 +981,6 @@ yt_dlp_supported_sites = [
     'redbulltv',
     'redbulltvrrncontent',
     'redcdnlivx',
-    'reddit',
     'redgifs',
     'redgifssearch',
     'redgifsuser',
