@@ -41,25 +41,7 @@ else:
     print("Could not retrieve song name.")
 from yt_dlp.postprocessor.common import PostProcessor
 
-
-class SquareThumbnailPP(PostProcessor):
-    def run(self, info):
-        # Loop through thumbnails and crop each
-        for thumb in info.get('thumbnails', []):
-            if 'filepath' in thumb:
-                in_file = thumb['filepath']
-                out_file = in_file.rsplit('.', 1)[0] + "_square.jpg"
-
-                # Run ffmpeg: crop to square, then scale to 500x500
-                self.run_ffmpeg(in_file, out_file, [
-                    '-vf', "crop='min(iw,ih)':'min(iw,ih)',scale=500:500"
-                ])
-
-                # Replace with new square thumbnail
-                thumb['filepath'] = out_file
-
-        return [], info
-
+# ipad only song_name = "Los Niños De La Calle - Grupo Cumbaya"
 
 ydl_opts = {
     'cookiesfrombrowser': ('opera',),
@@ -78,9 +60,6 @@ ydl_opts = {
             'key': 'FFmpegThumbnailsConvertor',
             'format': 'jpg',
         },
-        {   # Embed thumbnail
-            'key': 'EmbedThumbnail',
-        },
         {   # Embed metadata
             'key': 'FFmpegMetadata',
         },
@@ -89,6 +68,4 @@ ydl_opts = {
 
 
 with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-    # Manually add our custom thumbnail cropper
-    ydl.add_post_processor(SquareThumbnailPP(ydl))
     ydl.download([f'ytsearch:{song_name}'])
