@@ -7,6 +7,7 @@ import yt_dlp_sites
 import os
 from dotenv import load_dotenv
 from rich.progress import Progress, BarColumn, TextColumn, DownloadColumn, TransferSpeedColumn, TimeRemainingColumn
+import spotifydl
 # need to parse this: Namespace(command='download', yt_dlp=True, output=None, format=None, quality=None, gallery_dl=False, spotdl=False, tw=False, ig=False, auto=False, url='jfsdhbslodhfua')
 
 
@@ -53,10 +54,8 @@ def main(args):  # sourcery skip: use-any, use-named-expression, use-next
     elif dl == "instaloader":
         print("Using instaloader as downloader")
     elif dl == "spotdl":
-        print("Using spotdl (spotify downloader) as downloader")
-        load_dotenv(dotenv_path="spotify.env")
-        spotdl = Spotdl(client_id=os.getenv('SPOTIPY_CLIENT_ID'), client_secret=os.getenv('SPOTIPY_SECRET_ID'))
-        spotdl.downloader.search_and_download(link)
+        print("Using dcsdl (custom da cool media dl spotify downloader) as downloader")
+        spotifydl.main(link)
     elif dl == "auto":
         print("Using auto-detect downloader")
         found_substring = False

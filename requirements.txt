@@ -5,4 +5,6 @@ yt-dlp
 ffmpeg-python
 gallery-dl
 instaloader
-spotdl
+ytmusicapi
+spotipy
+eyed3
