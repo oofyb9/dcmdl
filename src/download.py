@@ -1,14 +1,12 @@
 from yt_dlp import YoutubeDL  # type: ignore
 from gallery_dl import config, job  # type: ignore
 import instaloader  # type: ignore
-from spotdl import Spotdl  # type: ignore
 import gallery_dl_sites
 import yt_dlp_sites
 import os
 from dotenv import load_dotenv
 from rich.progress import Progress, BarColumn, TextColumn, DownloadColumn, TransferSpeedColumn, TimeRemainingColumn
 import spotifydl
-# need to parse this: Namespace(command='download', yt_dlp=True, output=None, format=None, quality=None, gallery_dl=False, spotdl=False, tw=False, ig=False, auto=False, url='jfsdhbslodhfua')
 
 
 def main(args):  # sourcery skip: use-any, use-named-expression, use-next
@@ -49,11 +47,14 @@ def main(args):  # sourcery skip: use-any, use-named-expression, use-next
                 ydl.download(link)
     elif dl == "gallery-dl":
         print("Using gallery-dl as downloader")
+        config.load()
+        job.Job(link).run()
     elif dl == "twmd":
         print("Using twmd (twitter media downloader) as downloader")
     elif dl == "instaloader":
         print("Using instaloader as downloader")
-    elif dl == "spotdl":
+        
+    elif dl == "dcsdl":
         print("Using dcsdl (custom da cool media dl spotify downloader) as downloader")
         spotifydl.main(link)
     elif dl == "auto":
@@ -67,46 +68,43 @@ def main(args):  # sourcery skip: use-any, use-named-expression, use-next
             print(f"Detected '{link}' as a yt-dlp downloadable link. using yt-dlp")
         else:
             print(f"The string '{link}' is not downloadable by yt-dlp, trying gallery-dl")
-        found_gdl = False
-        for substring in gallery_dl_sites.gallery_dl_supported_sites:
-            if substring in link:
-                found_gdl = True
-                break
-        if found_gdl:
-            print(f"Detected '{link}' as a gallery-dl downloadable link. Using gallery-dl")
-        else:
-            print(f"The string '{link}' is not downloadable by gallery-dl, trying twmd (twitter media downloader)")
-        twmd_sites = ["x.com", "twitter.com"]
-        found_twmd = False
-        for substring in twmd_sites:
-            if substring in link:
-                found_twmd = True
-                break
-        if found_twmd:
-            print(f"Detected '{link}' as a X (formerly Twitter) link, using twmd")
-        else:
-            print(f"The string '{link}' is not a twitter link. Using instaloader")
-        insta_sites = ["instagram.com", "instagr.am"]
-        found_insta = False
-        for substring in insta_sites:
-            if substring in link:
-                found_insta = True
-                break
-        if found_insta:
-            print(f"Detected '{link}' as an instagram link, using instaloader")
-        else:
-            print(f"The string '{link}' is not an instagram link. trtying spotdl (spotify downloader)")
-        found_spotdl = False
-        spotdl_sites = ["spotify.com", "open.spotify.com"]
-        for substring in spotdl_sites:
-            if substring in link:
-                found_spotdl = True
-                break
-        if found_spotdl:
-            print(f"Detected '{link}' as a spotify link, using spotdl")
-        else:
-            print(f"Link '{link}' is not downloadable by yt-dlp, gallery-dl, twmd, instaloader, or spotDL. Exiting")
-            return 1
-    else:
-        print("Invalid downloader option. Use 'yt-dlp', 'gallery-dl', 'twmd', 'instaloader', 'spotdl', or 'auto'.")
-        return 1
+            found_gdl = False
+            for substring in gallery_dl_sites.gallery_dl_supported_sites:
+                if substring in link:
+                    found_gdl = True
+                    break
+            if found_gdl:
+                print(f"Detected '{link}' as a gallery-dl downloadable link. Using gallery-dl")
+            else:
+                print(f"The string '{link}' is not downloadable by gallery-dl, trying twmd (twitter media downloader)")
+                twmd_sites = ["x.com", "twitter.com"]
+                found_twmd = False
+                for substring in twmd_sites:
+                    if substring in link:
+                        found_twmd = True
+                        break
+                if found_twmd:
+                    print(f"Detected '{link}' as a X (formerly Twitter) link, using twmd")
+                else:
+                    print(f"The string '{link}' is not a twitter link. Using instaloader")
+                    insta_sites = ["instagram.com", "instagr.am"]
+                    found_insta = False
+                    for substring in insta_sites:
+                        if substring in link:
+                            found_insta = True
+                            break
+                    if found_insta:
+                        print(f"Detected '{link}' as an instagram link, using instaloader")
+                    else:
+                        print(f"The string '{link}' is not an instagram link. trying dcsdl (custom da cool spotify downloader)")
+                        found_spotdl = False
+                        spotdl_sites = ["spotify.com", "open.spotify.com"]
+                        for substring in spotdl_sites:
+                            if substring in link:
+                                found_spotdl = True
+                                break
+                        if found_spotdl:
+                            print(f"Detected '{link}' as a spotify link, using dcsdl (custom da cool media dl spotify downloader)")
+                        else:
+                            print(f"Link '{link}' is not downloadable by yt-dlp, gallery-dl, twmd, instaloader, or dcsdl. Exiting")
+                            return 1
