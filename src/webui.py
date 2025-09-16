@@ -1,30 +1,28 @@
 from nicegui import ui
-import webview
-import threading
-import os
 
-os.environ["GDK_BACKEND"] = "x11"
-os.environ["PYWEBVIEW_GUI"] = "gtk"   # or "qt"
-os.environ["WEBKIT_DISABLE_COMPOSITING_MODE"] = "1"
-os.environ["WEBKIT_DISABLE_ACCELERATED_2D_CANVAS"] = "1"
-def build_ui():
-    ui.label('DCMD - Download music from Spotify, YouTube and more.').classes('text-2xl m-4')
-def func1():
-    ui.run(port=8343, title="DCMD", reload=False, show=False)
-def main(arg):
-    if arg == "gui":
-        build_ui()
-        t = threading.Thread(target=func1, daemon=True)
-        t.start()
-        window = webview.create_window('DCMD', 'http://localhost:8343')
-        webview.start()
-        return
-    elif arg == "web":
-        build_ui()
-        ui.run(port=8343, title="DCMD", reload=False, show=True)
-        return
-    else:
-        print("Invalid argument for webui. Use 'gui' or 'web'.")
-        return 1
-if __name__ == '__main__':
-    main()
+ui.markdown("""
+# DCMD WebUI
+""")
+with ui.expansion('new download', icon='sym_r_download').classes('w-full'):
+    ui.label('new download')
+    i = ui.input(placeholder='enter url here...').classes('w-full')
+    ui.label('select downloader')
+    radio = ui.radio({1: 'yt-dlp', 2: 'gallery-dl', 3: 'instaloader', 4: "dcsdl", 5: "auto"}, value=5).props('inline')
+    ui.label('select auth method')
+    radio2 = ui.radio({1: 'user + pass', 2: 'oauth', 3: 'cookies', 4: "cookies from browser", 5: "none"}, value=5).props('inline')
+    j = ui.input(placeholder='output folder and styling...').classes('w-full')
+    ui.label('select quality')
+    radio3 = ui.radio({1: 'trash', 2: 'low', 3: 'medium', 4: "high", 5: "ultra-high"}, value=3).props('inline')
+    debug_mode = ui.checkbox('debug mode')
+    ui.button('start download').props('color=primary').on('click', lambda: print(i.value, radio.value, radio2.value, j.value, radio3.value, debug_mode.value))
+    ui.button('clear').props('color=primary').on('click', lambda: i.set_value('') or j.set_value(''))
+    ui.button('see formats').props('color=primary')
+with ui.expansion('continue', icon='sym_r_downloading').classes('w-full'):
+    ui.label('continue download')
+with ui.expansion('update download', icon='sym_r_download_for_offline').classes('w-full'):
+    ui.label('update download')
+ui.button('update software').props('color=primary')
+ui.button('check versions').props('color=primary')
+with ui.footer().style('background-color: #3874c8'):
+        ui.label('© 2025 oofybruh9. Licensed under the GPLv3.').style('text-align: center; color: white; width: 100%')
+ui.run(port=8343, title="DCMD", reload=True, show=False)

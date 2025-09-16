@@ -1,8 +1,6 @@
 nicegui
 argparse
-pywebview
 yt-dlp
-ffmpeg-python
 gallery-dl
 instaloader
 ytmusicapi
