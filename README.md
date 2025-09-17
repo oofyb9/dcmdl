@@ -1,50 +1,51 @@
-# dcmdl
-
-(add your badges here)
+![dcmdl logo](logo.png)
+  
+>
+![PyPI - Downloads](https://img.shields.io/pypi/dm/dcmdl) ![GitHub License](https://img.shields.io/github/license/oofyb9/dcmdl) ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/dcmd) ![GitHub Release](https://img.shields.io/github/v/release/oofyb9/dcmdl) ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/oofyb9/dcmdl/release) ![GitHub Repo stars](https://img.shields.io/github/stars/oofyb9/dcmdl?style=social)
 
 > *the best multimedia downloader for all websites*
 
-## 🌟 why so special?
+# dcmdl 🤯 <sub>idk why im here 🤯🤯🤯</sub>
 
-- custom spotify downloader (absolute pain to build)
+## 🌟 why so special? 
+
+- custom spotify and twitter (in development) downloader (absolute pain to build)
 - easy access to all your favorite downloaders
 - no-hassle install
 
-## ℹ️ wtf is this
+## ℹ️ wtf is this 🥀
 
 A paragraph explaining your work, who you are, and why you made it.
 
-### ✍️ who tf wrote ts 
+### ✍️ who tf wrote ts 🥀
 
 Mention who you are and link to your GitHub or organization's website.
 
-## 🚀 usage
+## 🚀 usage 
 
 TBD
 
-## ⬇️ install
+## ⬇️ install dis shit
 
 ### u need:
+
 - a stable os (linux 6.X, macos 13+, windows 8+, android 8+)
 - python (for pip build)
 - a pc/phone (duh)
-- 
+
 ### install table
 
 |OS|Link|
 |-|-|
-|win x64|link|
-|win arm64|link|
-|macos universal|link|
-|linux x64|link|
-|linux arm64 (+ phones)|link|
+|win x64|[link](https://example.com)|
+|win arm64|[link](https://example.com)|
+|macos universal|[link](https://example.com)|
+|linux x64|[link](https://example.com)|
+|linux arm64 (+ phones)|[link](https://example.com)|
 
 ```bash
 pip install dcmdl
 ```
-
-
-*You may be inclined to add development instructions here, don't.*
 
 ## 💭 yap abt issues and dcmdl
 

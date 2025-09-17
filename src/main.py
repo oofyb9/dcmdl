@@ -7,6 +7,7 @@ def main():  # sourcery skip: extract-duplicate-method, merge-comparisons
         prog='dcmd',
         description='the coolest damn media downloader ever.'
     )
+    parser.add_argument("-v",'--version', action='version', version='dcmd 0.1.0-beta-really-unstable-do-not-use-it-cuz-it-will-break-everything')
 
     # subparsers for different commands
     subparsers = parser.add_subparsers(dest='command', help='Available commands')
@@ -27,7 +28,6 @@ def main():  # sourcery skip: extract-duplicate-method, merge-comparisons
     download_parser.add_argument('-L', "--list-format", action='store_true', help='list available formats for the given URL and exit')
     download_parser.add_argument('-U', "--update", action='store_true', help='download the latest version of the downloader tools (yt-dlp, gallery-dl, etc.)')
     download_parser.add_argument('-D', "--debug", action='store_true', help='enable debug mode (more verbose output)')
-    download_parser.add_argument('-v', "--version", action='store_true', help='show version information and exit')
     download_parser.add_argument('-m', "--download-missing", action='store_true', help='download only missing files in a playlist/album/user')
     download_parser.add_argument('-N', "--continue", dest='continue_dl', action='store_true', help='resume partially downloaded files')
     download_parser.add_argument("-C", "--cookies-from-browser", type=str, help="attempt to extract cookies from your browser (only works on some browsers (mostly chromium based ones))")
@@ -38,7 +38,7 @@ def main():  # sourcery skip: extract-duplicate-method, merge-comparisons
     if args.command == 'download':
         download.main(args)
     elif args.command == 'web':
-        webui.main()
+        webui.start()
     else:
         parser.print_help()
 
