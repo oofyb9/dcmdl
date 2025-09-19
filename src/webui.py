@@ -1,5 +1,28 @@
-from nicegui import ui
+from nicegui import ui, html
+import random
 def start():
+    with open(r'console_quotes.txt', "r") as f:
+        l = [line.rstrip() for line in f]
+        print(l)
+    with open(r'console_quotes.txt', "r") as fi:
+        lines = len(fi.readlines())
+        print(lines)
+    num = random.randint(0, lines)
+    ui.add_css(""".konsole{
+    background-color: #1e1e1e;
+    color: #c0c0c0;
+    font-family: 'Fira Code', monospace;
+    font-size: 12pt;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    overflow-y: auto;
+    height: 400px;
+    width: 100%;
+    overflow-x: auto;
+    height: 10%;
+}
+            """)
     ui.markdown("""
     # DCMD WebUI
     """)
@@ -21,8 +44,9 @@ def start():
         ui.label('continue download')
     with ui.expansion('update download', icon='sym_r_download_for_offline').classes('w-full'):
         ui.label('update download')
-    ui.button('update software').props('color=primary')
-    ui.button('check versions').props('color=primary')
+    ui.button('update software').props('color=primary').on('click', lambda: ui.notify('updating... (not really, this is just a demo)'))
+    ui.button('check versions').props('color=primary').on('click', lambda: ui.notify('yt-dlp: 2024.06.06, gallery-dl: 1.28.3, instaloader: 4.9.6, dcsdl: 0.3.5, dcmd: 0.1.0-beta-really-unstable-do-not-use-it-cuz-it-will-break-everything'))
+    html.div(l[num]).classes('konsole')
     with ui.footer().style('background-color: #3874c8'):
             ui.label('© 2025 oofybruh9. Licensed under the GPLv3.').style('text-align: center; color: white; width: 100%')
     ui.run(port=8343, title="DCMD", reload=True, show=False)
