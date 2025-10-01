@@ -1,13 +1,14 @@
 import argparse
 import download
 import webui
-
+dcmdl_ver = "0.1.0-beta-really-unstable-do-not-use-it-cuz-it-will-break-everything"
 def main():  # sourcery skip: extract-duplicate-method, merge-comparisons
+    dcmdl_ver = "0.1.0-beta-really-unstable-do-not-use-it-cuz-it-will-break-everything"
     parser = argparse.ArgumentParser(
         prog='dcmd',
         description='the coolest damn media downloader ever.'
     )
-    parser.add_argument("-v",'--version', action='version', version='dcmd 0.1.0-beta-really-unstable-do-not-use-it-cuz-it-will-break-everything')
+    parser.add_argument("-v",'--version', action='version', version=dcmdl_ver)
 
     # subparsers for different commands
     subparsers = parser.add_subparsers(dest='command', help='Available commands')
