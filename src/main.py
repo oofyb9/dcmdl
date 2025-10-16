@@ -1,6 +1,5 @@
 import argparse
 import download
-import webui
 dcmdl_ver = "0.1.0-beta-really-unstable-do-not-use-it-cuz-it-will-break-everything"
 def main():  # sourcery skip: extract-duplicate-method, merge-comparisons
     dcmdl_ver = "0.1.0-beta-really-unstable-do-not-use-it-cuz-it-will-break-everything"
@@ -13,11 +12,8 @@ def main():  # sourcery skip: extract-duplicate-method, merge-comparisons
     # subparsers for different commands
     subparsers = parser.add_subparsers(dest='command', help='Available commands')
 
-    # GUI command
-    gui_parser = subparsers.add_parser('web', help='launch the webUI', aliases="w")
-
     # download command
-    download_parser = subparsers.add_parser('download', aliases="d", help='download a media file')
+    download_parser = subparsers.add_parser('download', aliases=['dl'], help='download a media file')
     download_parser.add_argument('-o', '--output', type=str, help='output file name')
     download_parser.add_argument('-f', '--format', type=str, help='format of the media to download')
     download_parser.add_argument('-q', '--quality', type=str, help='quality of the media to download')
@@ -34,12 +30,25 @@ def main():  # sourcery skip: extract-duplicate-method, merge-comparisons
     download_parser.add_argument("-C", "--cookies-from-browser", type=str, help="attempt to extract cookies from your browser (only works on some browsers (mostly chromium based ones))")
     download_parser.add_argument('url', type=str, help='URL of the media to download')
 
+    # the plugin command (used for using plugins for better downloading experience (tbd *sigh*))
+    plugins_parser = subparsers.add_parser('plugins', aliases=["plgn"], help='use pluging for better downloading experience (tbd *sigh*)')
+    plugins_parser.add_argument('plugin', type=str, help='plugin name (tbd *sigh*)')
+    plugins_parser.add_argument('args', nargs=argparse.REMAINDER, help='arguments for the plugin (tbd *sigh*)')
+
+    # the plugin manager command (used for managing plugins listed on github (tbd *sigh*))
+    pluginm_parser = subparsers.add_parser('plugin-manager', aliases=["pm"], help='manage plugins listed on github (tbd *sigh*)')
+    pluginm_parser.add_argument('action', type=str, choices=['install', 'remove', 'update', 'list'], help='action to perform on the plugins (tbd *sigh*)')
+    pluginm_parser.add_argument('plugin', nargs='?', type=str, help='plugin name (tbd *sigh*)')
+
+    # configure command (used for configuring dcmdl settings (tbd *sigh*))
+    config_parser = subparsers.add_parser('config', aliases=["cfg"], help='configure dcmdl settings (tbd *sigh*)')
+    config_parser.add_argument('setting', nargs='?', type=str, help='setting name to configure (tbd *sigh*)')
+    config_parser.add_argument('value', nargs='?', type=str, help='value to set for the setting (tbd *sigh*)')
+
     args = parser.parse_args()
 
     if args.command == 'download':
         download.main(args)
-    elif args.command == 'web':
-        webui.start()
     else:
         parser.print_help()
 
