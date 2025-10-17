@@ -47,8 +47,17 @@ def main():  # sourcery skip: extract-duplicate-method, merge-comparisons
 
     args = parser.parse_args()
 
-    if args.command == 'download':
+    if args.command in ['download', 'dl']:
         download.main(args)
+    if args.command in ['plugins', 'plgn']:
+        import plugin
+        return plugin.main(args)
+    elif args.command in ['plugin-manager', 'pm']:
+        import plugin_manager
+        return plugin_manager.main(args)
+    elif args.command in ['config', 'cfg']:
+        import config
+        return config.cli_main([args.setting, args.value])
     else:
         parser.print_help()
 

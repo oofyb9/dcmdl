@@ -3,7 +3,6 @@ from spotipy.oauth2 import SpotifyClientCredentials
 import os
 from dotenv import load_dotenv
 import yt_dlp
-import ffmpeg
 import  ytmusicapi
 from PIL import Image
 import eyed3

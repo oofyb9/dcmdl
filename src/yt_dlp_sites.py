@@ -1119,7 +1119,6 @@ yt_dlp_supported_sites = [
     'sport5',
     'sportbox',
     'sportdeutschland',
-    'spotify',
     'spreaker',
     'spreakershow',
     'springboardplatform',
