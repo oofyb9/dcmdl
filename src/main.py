@@ -1,21 +1,21 @@
-import argparse
-import download
+import argparse, download, plugin, pluginmanager
+
 dcmdl_ver = "0.1.0-beta-really-unstable-do-not-use-it-cuz-it-will-break-everything"
+
 def main():  # sourcery skip: extract-duplicate-method, merge-comparisons
-    dcmdl_ver = "0.1.0-beta-really-unstable-do-not-use-it-cuz-it-will-break-everything"
     parser = argparse.ArgumentParser(
         prog='dcmd',
         description='the coolest damn media downloader ever.'
     )
-    parser.add_argument("-v",'--version', action='version', version=dcmdl_ver)
+    parser.add_argument("-v", '--version', action='version', version=dcmdl_ver)
 
-    # subparsers for different commands
+    # Subparsers for different commands
     subparsers = parser.add_subparsers(dest='command', help='Available commands')
 
-    # download command
-    download_parser = subparsers.add_parser('download', aliases=['dl'], help='download a media file')
-    download_parser.add_argument('-o', '--output', type=str, help='output file name')
-    download_parser.add_argument('-f', '--format', type=str, help='format of the media to download')
+    # Download command
+    download_parser = subparsers.add_parser('download', aliases=['dl'], help='Download a media file')
+    download_parser.add_argument('-o', '--output', type=str, help='Output file name')
+    download_parser.add_argument('-f', '--format', type=str, help='Format of the media to download')
     download_parser.add_argument('-q', '--quality', type=str, help='quality of the media to download')
     download_parser.add_argument('-d', "--downloader", type=str, default="auto", help="downloader to use (auto (default, a bit accurate), ytdlp, dcsdl, tw, ig, gallerydl)")
     download_parser.add_argument('-u', "--username", type=str, help='login username for private content (instagram, twitter, etc.)')
@@ -40,26 +40,18 @@ def main():  # sourcery skip: extract-duplicate-method, merge-comparisons
     pluginm_parser.add_argument('action', type=str, choices=['install', 'remove', 'update', 'list'], help='action to perform on the plugins (tbd *sigh*)')
     pluginm_parser.add_argument('plugin', nargs='?', type=str, help='plugin name (tbd *sigh*)')
 
-    # configure command (used for configuring dcmdl settings (tbd *sigh*))
-    config_parser = subparsers.add_parser('config', aliases=["cfg"], help='configure dcmdl settings (tbd *sigh*)')
-    config_parser.add_argument('setting', nargs='?', type=str, help='setting name to configure (tbd *sigh*)')
-    config_parser.add_argument('value', nargs='?', type=str, help='value to set for the setting (tbd *sigh*)')
-
-    args = parser.parse_args()
+    # Parse arguments
+    args, remaining = parser.parse_known_args()
 
     if args.command in ['download', 'dl']:
-        download.main(args)
+        return download.main(args)
     if args.command in ['plugins', 'plgn']:
-        import plugin
         return plugin.main(args)
     elif args.command in ['plugin-manager', 'pm']:
-        import plugin_manager
-        return plugin_manager.main(args)
-    elif args.command in ['config', 'cfg']:
-        import config
-        return config.cli_main([args.setting, args.value])
+        return pluginmanager.main(args)
     else:
         parser.print_help()
+        return 1
 
 if __name__ == '__main__':
-    main()
+    raise SystemExit(main())
