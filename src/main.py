@@ -31,14 +31,10 @@ def main():  # sourcery skip: extract-duplicate-method, merge-comparisons
     download_parser.add_argument("-C", "--cookies-from-browser", type=str, help="attempt to extract cookies from your browser (works with chromium and firefox based browsers)")
     download_parser.add_argument('url', type=str, help='URL of the media to download')
 
-    # the plugin command (used for using plugins for better downloading experience (tbd *sigh*))
-    plugins_parser = subparsers.add_parser('plugins', aliases=["plgn"], help='use pluging for better downloading experience')
-    plugins_parser.add_argument('plugin', type=str, help='plugin name')
-    plugins_parser.add_argument('args', nargs=argparse.REMAINDER, help='arguments for the plugin')
-
-    # the plugin manager command (used for managing plugins listed on github (tbd *sigh*))
+    # the plugin manager command (used for managing plugins listed on github
     pluginm_parser = subparsers.add_parser('plugin-manager', aliases=["pm"], help='manage plugins listed on github')
     pluginm_parser.add_argument('action', type=str, choices=['install', 'remove', 'update', 'list'], help='action to perform on the plugins')
+    pluginm_parser.add_argument('-p', '--plain', action='store_true', help='output plain text (for scripting)')
     pluginm_parser.add_argument('plugin', nargs='?', type=str, help='plugin name')
 
     # Parse arguments

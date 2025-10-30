@@ -138,7 +138,36 @@ def rm_plgn(name: str) -> int:
         console.print(f"[red]Failed to remove plugin '{name}': {e}[/red]")
         return 1
 
-def list_plgn() -> int:
+def list_plgn(plain) -> int:
+    if plain:
+        list_plgn_plain()
+    else:
+        if os.name == "nt":
+            appdata = os.getenv("APPDATA")
+            base_dir = Path(appdata) if appdata else (Path.home() / "AppData" / "Roaming")
+            config_dir = base_dir / "dcmdl" / "plugins"
+        else:
+            config_dir = Path.home() / ".config" / "dcmdl" / "plugins"
+
+        if not config_dir.exists():
+            console.print("[yellow]No plugins directory found.[/yellow]")
+            return 0
+
+        plugins = [p.stem for p in config_dir.glob("*.py")]
+        if not plugins:
+            console.print("[yellow]No plugins installed.[/yellow]")
+            return 0
+
+        table = Table(title="Installed Plugins")
+        table.add_column("Plugin Name", style="cyan", no_wrap=True)
+
+        for plugin in plugins:
+            table.add_row(plugin)
+
+        console.print(table)
+        return 0
+
+def list_plgn_plain(scripting: bool, single_line: bool) -> str:
     if os.name == "nt":
         appdata = os.getenv("APPDATA")
         base_dir = Path(appdata) if appdata else (Path.home() / "AppData" / "Roaming")
@@ -147,22 +176,21 @@ def list_plgn() -> int:
         config_dir = Path.home() / ".config" / "dcmdl" / "plugins"
 
     if not config_dir.exists():
-        console.print("[yellow]No plugins directory found.[/yellow]")
-        return 0
+        return ""
 
     plugins = [p.stem for p in config_dir.glob("*.py")]
-    if not plugins:
-        console.print("[yellow]No plugins installed.[/yellow]")
+    if scripting:
+        pluginsj = ""  # Initialize the variable here
+        for plugin in plugins:
+            if single_line:
+                pluginsj += f"{plugin},"
+            else:
+                pluginsj += f"{plugin}\n"
+        return pluginsj  # Return the concatenated string
+    else:
+        for plugin in plugins:
+            console.print(plugin)
         return 0
-
-    table = Table(title="Installed Plugins")
-    table.add_column("Plugin Name", style="cyan", no_wrap=True)
-
-    for plugin in plugins:
-        table.add_row(plugin)
-
-    console.print(table)
-    return 0
 
 def update_plgn(name: str) -> int:
     if not name:
@@ -175,13 +203,12 @@ def update_plgn(name: str) -> int:
     return install_plugin(name, metadata, True)
 
 def main(argv: List[str]) -> int:
-    print(argv)
     if argv.action == "install":
         return install_plgn(argv.plugin)
     elif argv.action == "remove":
         return rm_plgn(argv.plugin)
     elif argv.action == "list":
-        return list_plgn()
+        return list_plgn(argv.plain)
     elif argv.action == "update":
         return update_plgn(argv.plugin)
     else:

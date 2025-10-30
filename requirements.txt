@@ -7,3 +7,4 @@ spotipy
 eyed3
 rich
 pillow
+playwright

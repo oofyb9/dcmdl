@@ -1,15 +1,9 @@
 from yt_dlp import YoutubeDL  # type: ignore
 from gallery_dl import config, job  # type: ignore
-import instaloader  # type: ignore
-import gallery_dl_sites
-import yt_dlp_sites
-import os
+import instaloader, gallery_dl_sites, yt_dlp_sites, os, spotifydl, pluginmanager, plugin  # type: ignore
 from dotenv import load_dotenv
 from rich.progress import Progress, BarColumn, TextColumn, DownloadColumn, TransferSpeedColumn, TimeRemainingColumn
 from rich.console import Console
-import spotifydl
-import twitterdl
-
 console = Console()
 
 def yt_dlp_download(link):
@@ -92,9 +86,6 @@ def main(args):
     elif dl == "dcsdl":
         console.print("[bold green]Using dcsdl (custom da cool media dl spotify downloader) as downloader")
         spotifydl.main(link)
-    elif dl == "dcxdl":
-        console.print("[bold green]Using dctdl (custom da cool media dl tiktok downloader) as downloader")
-        twitterdl.main(args)
     elif dl == "auto":
         console.print("[bold green]Using auto-detect downloader")
         found_substring = any(substring in link for substring in yt_dlp_sites.yt_dlp_supported_sites)
@@ -119,11 +110,14 @@ def main(args):
                         console.print(f"[bold yellow]Detected '{link}' as a spotify link, using dcsdl (custom da cool media dl spotify downloader)")
                         spotifydl.main(link)
                     else:
-                        twitter_sites = ["twitter.com", "x.com"]
-                        found_twitter = any(substring in link for substring in twitter_sites)
-                        if found_twitter:
-                            console.print(f"[bold yellow]Detected '{link}' as a twitter link, using dctdl (custom da cool media dl tiktok downloader)")
-                            twitterdl.main(args)
-                        else:
-                            console.print(f"[red]Link '{link}' is not downloadable by yt-dlp, gallery-dl, instaloader, dcsdl, or dcxdl. Exiting")
-                            return 1
+                        console.print(f"[red]Link '{link}' is not downloadable by yt-dlp, gallery-dl, instaloader, or dcsdl. Exiting")
+                        return 1
+    else:
+        plugins = pluginmanager.list_plgn_plain(True, False)
+        if dl in plugins:
+            console.print(f"[bold green]Using plugin '{dl}' as downloader")
+            return plugin.use_plgn(dl, args)
+        else:
+            plugin_names = pluginmanager.list_plgn_plain(True, True)
+            console.print(f"[red]no downloader found out of list of downloaders: yt-dlp, dcsdl, gallery-dl, instaloader, or any plugin ({plugin_names}). Exiting")
+            return 1
