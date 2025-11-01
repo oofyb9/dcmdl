@@ -1,7 +1,5 @@
 from pathlib import Path
-import os
-import sys
-import importlib.util
+import os, sys, importlib.util
 
 from rich.console import Console
 from rich.panel import Panel

@@ -1,23 +1,43 @@
-import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
-import os
+import os, yt_dlp, re, ytmusicapi, eyed3, spotipy
 from dotenv import load_dotenv
-import yt_dlp
-import  ytmusicapi
 from PIL import Image
-import eyed3
 from eyed3.id3.frames import ImageFrame
 from rich.progress import Progress, BarColumn, TextColumn, DownloadColumn, TransferSpeedColumn, TimeRemainingColumn
 from rich.console import Console
 
-def main(spotify_track_link):
+def find_files_with_regex(pattern):
+    matching_files = []
+    # Compile the regex pattern for efficiency
+    regex = re.compile(pattern)
+    # Get all files and directories in the current working directory
+    for filename in os.listdir('.'):
+        # Check if the current item is a file (not a directory)
+        if os.path.isfile(filename):
+            # Use regex.search() to find a match anywhere in the filename
+            if regex.search(filename):
+                matching_files.append(filename)
+    return matching_files
+
+def get_args(args):
+    pass
+
+def main(args):
+    print(args)
     console = Console()
     load_dotenv(dotenv_path="spotify.env")
     SPOTIPY_CLIENT_ID = os.getenv('SPOTIPY_CLIENT_ID')
     SPOTIPY_SECRET_ID = os.getenv('SPOTIPY_SECRET_ID')
-    client_credentials_manager = SpotifyClientCredentials(client_id=SPOTIPY_CLIENT_ID, client_secret=SPOTIPY_SECRET_ID)
+    if not SPOTIPY_CLIENT_ID or not SPOTIPY_SECRET_ID:
+        console.print("[red]Error: SPOTIPY_CLIENT_ID and SPOTIPY_SECRET_ID must be set in spotify.env file.[/red]")
+        console.print("[yellow]You can create a Spotify Developer account and create an app to get these credentials.[/yellow]")
+        console.print("[yellow]Visit https://developer.spotify.com/dashboard/applications to create an app.[/yellow]")
+        return 67
+    else:
+        client_credentials_manager = SpotifyClientCredentials(client_id=SPOTIPY_CLIENT_ID, client_secret=SPOTIPY_SECRET_ID)
     sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
-
+    console.print("[yellow]This is only for single tracks. To download playlists or login, you will need to download the spotdl plugin.[/yellow]")
+    console.print("[yellow]This downloader is also not accurate 100% of the time, so please be patient if it messes up.[/yellow]")
     # Step 1: Get song name
     with console.status("[bold green]Getting song name from Spotify link..."):
         def get_song_name_from_link(spotify_link):
@@ -32,7 +52,7 @@ def main(spotify_track_link):
                 console.print(f"[red]Error: {e}")
                 return None
 
-        song_name = get_song_name_from_link(spotify_track_link)
+        song_name = get_song_name_from_link(args.url)
         real_song_name = song_name.split(" -", 1)[0] if song_name else None
 
     if song_name:
@@ -126,7 +146,7 @@ def main(spotify_track_link):
                 img = Image.open(image_path)
             except FileNotFoundError:
                 console.print(f"[red]Error: Image not found at {image_path}")
-                return
+                return 2
             width, height = img.size
             left = (width - height) / 2
             top = 0
@@ -136,15 +156,15 @@ def main(spotify_track_link):
             cropped_img = img.crop(crop_box)
             cropped_img.save(output_path)
             console.print(f"[bold green]Image cropped and saved to {output_path}")
-
-        crop_to_square_same_height(f'{real_song_name}.jpg', f'{real_song_name}.jpg')
+        sng_nm = find_files_with_regex(rf"^{re.escape(real_song_name)}\.*")
+        crop_to_square_same_height(f'{sng_nm[0]}', f'{sng_nm[0]}')
 
     # Step 5: Embed album image
     with console.status("[bold green]Embedding album image into MP3..."):
-        audiofile = eyed3.load(f'{real_song_name}.mp3')
+        audiofile = eyed3.load(f'{sng_nm[1]}')
         if (audiofile.tag == None):
             audiofile.initTag()
-        audiofile.tag.images.set(ImageFrame.FRONT_COVER, open(f'{real_song_name}.jpg','rb').read(), 'image/jpeg')
+        audiofile.tag.images.set(ImageFrame.FRONT_COVER, open(f'{sng_nm[1]}','rb').read(), 'image/jpeg')
         audiofile.tag.save()
-        os.remove(f'{real_song_name}.jpg')
+        os.remove(f'{sng_nm[0]}')
         console.print(f"[bold green]Album image embedded and temp image removed.")
