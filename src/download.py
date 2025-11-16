@@ -4,6 +4,7 @@ import instaloader, gallery_dl_sites, yt_dlp_sites, os, spotifydl, pluginmanager
 from dotenv import load_dotenv
 from rich.progress import Progress, BarColumn, TextColumn, DownloadColumn, TransferSpeedColumn, TimeRemainingColumn
 from rich.console import Console
+import requests
 console = Console()
 
 def yt_dlp_download(args):
@@ -66,33 +67,28 @@ def gallery_dl_download(args):
         job.Job(args.url).run()
         progress.update(task_id, advance=1)
 
-def instaloader_download(link):
+def instaloader_download(args):
     post_links = ["post/", "tv/", "reel/", "p/", "stories/", "highlights/", "igtv/"]
-    is_post = any(substring in link for substring in post_links)
-    L = instaloader.Instaloader()
+    is_post = any(substring in args.url for substring in post_links)
+    L = instaloader.Instaloader(False, False, None, args.folder, args.filename, True, True, True, save_metadata=True, title_pattern=args.title, max_connection_attempts=args.tries)
     with Progress(
         TextColumn("[progress.description]{task.description}"),
         BarColumn(),
         transient=True,
     ) as progress:
-        task_id = progress.add_task(f"[cyan]instaloader: {link}", total=1)
+        task_id = progress.add_task(f"[cyan]instaloader: {args.url}", total=1)
         if is_post:
-            shortcode = link.split("/")[-2]
+            shortcode = args.url.split("/")[-2]
             post = instaloader.Post.from_shortcode(L.context, shortcode)
             L.download_post(post, target=post.owner_username)
         else:
-            username = link.split("/")[-2]
+            username = args.url.split("/")[-2]
             profile = instaloader.Profile.from_username(L.context, username)
             L.download_profile(profile, profile_pic_only=False)
         progress.update(task_id, advance=1)
 
 def main(args):
-    link = args.url
     dl = args.downloader
-    opt = args.output
-    frmt = args.format
-    qual = args.quality
-
     if dl == "yt-dlp":
         console.print("[bold green]Using yt-dlp as downloader")
         yt_dlp_download(args)
@@ -101,36 +97,66 @@ def main(args):
         gallery_dl_download(args)
     elif dl == "instaloader":
         console.print("[bold green]Using instaloader as downloader")
-        instaloader_download(link)
+        instaloader_download(args)
     elif dl == "dcsdl":
         console.print("[bold green]Using dcsdl (custom da cool media dl spotify downloader) as downloader")
         spotifydl.main(args)
     elif dl == "auto":
         console.print("[bold green]Using auto-detect downloader")
-        found_substring = any(substring in link for substring in yt_dlp_sites.yt_dlp_supported_sites)
+        found_substring = any(substring in args.url for substring in yt_dlp_sites.yt_dlp_supported_sites)
         if found_substring:
-            console.print(f"[bold yellow]Detected '{link}' as a yt-dlp downloadable link. using yt-dlp")
+            console.print(f"[bold yellow]Detected '{args.url}' as a yt-dlp downloadable link. using yt-dlp")
             yt_dlp_download(args)
         else:
-            found_gdl = any(substring in link for substring in gallery_dl_sites.gallery_dl_supported_sites)
+            found_gdl = any(substring in args.url for substring in gallery_dl_sites.gallery_dl_supported_sites)
             if found_gdl:
-                console.print(f"[bold yellow]Detected '{link}' as a gallery-dl downloadable link. Using gallery-dl")
+                console.print(f"[bold yellow]Detected '{args.url}' as a gallery-dl downloadable link. Using gallery-dl")
                 gallery_dl_download(args)
             else:
                 insta_sites = ["instagram.com", "instagr.am"]
-                found_insta = any(substring in link for substring in insta_sites)
+                found_insta = any(substring in args.url for substring in insta_sites)
                 if found_insta:
-                    console.print(f"[bold yellow]Detected '{link}' as an instagram link, using instaloader")
-                    instaloader_download(link)
+                    console.print(f"[bold yellow]Detected '{args.url}' as an instagram link, using instaloader")
+                    instaloader_download(args)
                 else:
                     spotdl_sites = ["spotify.com", "open.spotify.com"]
-                    found_spotdl = any(substring in link for substring in spotdl_sites)
+                    found_spotdl = any(substring in args.url for substring in spotdl_sites)
                     if found_spotdl:
-                        console.print(f"[bold yellow]Detected '{link}' as a spotify link, using dcsdl (custom da cool media dl spotify downloader)")
+                        console.print(f"[bold yellow]Detected '{args.url}' as a spotify link, using dcsdl (custom da cool media dl spotify downloader)")
                         spotifydl.main(args)
                     else:
-                        console.print(f"[red]Link '{link}' is not downloadable by yt-dlp, gallery-dl, instaloader, or dcsdl. Exiting")
-                        return 1
+                        plugins = pluginmanager.list_plgn_plain(True, False)
+                        plugin_array = plugins.splitlines()
+                        for item in plugin_array:
+                            url = f"https://raw.githubusercontent.com/oofybruh9/dcmdl-plugins/refs/heads/main/plugins/{item}.json"
+                            with console.status(f"[cyan]Checking if plugin [bold]{item}[/bold] supports [bold]{args.url}[/bold]...", spinner="dots"):
+                                try:
+                                    # Fetch plugin metadata
+                                    resp = requests.get(url, timeout=10)
+                                    if resp.status_code == 200:
+                                        jsonmn = resp.json()
+                                    elif resp.status_code == 404:
+                                        console.print(f"[red]Plugin '{item}' not found (404).")
+                                        continue
+                                    else:
+                                        console.print(f"[red]Failed to fetch metadata for plugin '{item}': HTTP {resp.status_code}")
+                                        continue
+                                except requests.RequestException as e:
+                                    console.print(f"[red]Request error while fetching plugin '{item}': {e}")
+                                    continue
+
+                                # Check if the URL is supported by the plugin
+                                if jsonmn and 'supported_sites' in jsonmn:
+                                    found_plugin = any(substring in args.url for substring in jsonmn['supported_sites'])
+                                    if found_plugin:
+                                        console.print(f"[bold yellow]Detected '{args.url}' as a {item} link. Using {item} plugin.")
+                                        try:
+                                            return plugin.use_plgn(item, args)
+                                        except Exception as e:
+                                            console.print(f"[red]Error while running plugin '{item}': {e}")
+                                            return 1
+                                else:
+                                    console.print(f"[red]Plugin '{item}' does not have valid metadata or does not support the URL.")
     else:
         plugins = pluginmanager.list_plgn_plain(True, False)
         if dl in plugins:

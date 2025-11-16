@@ -140,7 +140,7 @@ def rm_plgn(name: str) -> int:
 
 def list_plgn(plain) -> int:
     if plain:
-        list_plgn_plain()
+        list_plgn_plain(False, False)
     else:
         if os.name == "nt":
             appdata = os.getenv("APPDATA")

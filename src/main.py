@@ -29,6 +29,8 @@ def main():  # sourcery skip: extract-duplicate-method, merge-comparisons
     download_parser.add_argument('-m', "--download-missing", action='store_true', help='download only missing files in a playlist/album/user')
     download_parser.add_argument('-N', "--continue", dest='continue_dl', action='store_true', help='resume partially downloaded files')
     download_parser.add_argument("-C", "--cookies-from-browser", type=str, help="attempt to extract cookies from your browser (works with chromium and firefox based browsers)")
+    download_parser.add_argument("-t", "--title", type=str, help="title pattern (used by instaloader)")
+    download_parser.add_argument("-T", "--tries", type=int, help="# of attempts for download")
     download_parser.add_argument('url', type=str, help='URL of the media to download')
 
     # the plugin manager command (used for managing plugins listed on github

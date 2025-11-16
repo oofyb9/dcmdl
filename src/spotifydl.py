@@ -1,6 +1,6 @@
 from spotipy.oauth2 import SpotifyClientCredentials
 import os, yt_dlp, re, ytmusicapi, eyed3, spotipy
-from dotenv import load_dotenv
+from dotenv import load_dotenv, dotenv_values
 from PIL import Image
 from eyed3.id3.frames import ImageFrame
 from rich.progress import Progress, BarColumn, TextColumn, DownloadColumn, TransferSpeedColumn, TimeRemainingColumn
@@ -25,13 +25,17 @@ def get_args(args):
 def main(args):
     print(args)
     console = Console()
-    load_dotenv(dotenv_path="spotify.env")
+    if not os.path.exists("spotify.env"):
+        console.print("[red]Error: spotify.env file not found.[/red]")
+        console.print("[yellow]DCSDL will attempt to find these variables in your shell[/yellow]")
+    else: load_dotenv(dotenv_path="spotify.env")
     SPOTIPY_CLIENT_ID = os.getenv('SPOTIPY_CLIENT_ID')
     SPOTIPY_SECRET_ID = os.getenv('SPOTIPY_SECRET_ID')
     if not SPOTIPY_CLIENT_ID or not SPOTIPY_SECRET_ID:
-        console.print("[red]Error: SPOTIPY_CLIENT_ID and SPOTIPY_SECRET_ID must be set in spotify.env file.[/red]")
+        console.print("[red]Error: SPOTIPY_CLIENT_ID and SPOTIPY_SECRET_ID must be set in a spotify.env file or in your shell's variables.[/red]")
         console.print("[yellow]You can create a Spotify Developer account and create an app to get these credentials.[/yellow]")
         console.print("[yellow]Visit https://developer.spotify.com/dashboard/applications to create an app.[/yellow]")
+        console.print("[yellow]Make sure to set the SPOTIPY_CLIENT_ID and SPOTIPY_SECRET_ID variables in your spotify.env file or shell.[/yellow]")
         return 67
     else:
         client_credentials_manager = SpotifyClientCredentials(client_id=SPOTIPY_CLIENT_ID, client_secret=SPOTIPY_SECRET_ID)
